@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 struct Node {
 	int k;
@@ -27,7 +28,7 @@ void insert(int x, char* c){
 	}
 
 	else{
-		if(c == "L"){
+		if(strcmp(c, "L") == 0){
 			t = ptr;
 			t->next = head;
 			head->prev = t;
@@ -58,31 +59,45 @@ struct Node* find(int x){
 	return curr_node;
 }
 
-
-/* TODO */
 void delete(int x){
 	struct Node* y = find(x);
-	if(y != NULL) printf("%d\n",y->k);
+	if(y == NULL) return;
+
+	if(y == head){
+		head = y->next;
+		y->next = NULL;
+	}
+	if(y == tail){
+		tail = y->prev;
+		tail->next = NULL;
+	}
+	if(y != NULL) printf("del -> %d\n",y->k);
+	free(y);
+	i--;
 }
 
 int main(){
 	insert(6, "R");
 	insert(69, "R");
 	insert(111, "L");
-	insert(4,"R");
-	//find(111);
-	//find(4);
-	//find(42);
+	insert(4, "R");
 	delete(111);
-	delete(42);
+	//delete(42);
+	//delete(4);
+	delete(6);
+	//delete(69);
 
 	struct Node* curr_node = head;
 
-	while(curr_node != NULL){
-		printf("%d : %p | ",curr_node->k, &curr_node->next);
-		curr_node = curr_node->next;
-	}
-	printf("\n");
+	if(curr_node != NULL){
+		printf("val of head: %d\n",head->k);
+		printf("val of tail: %d\n",tail->k);
 
+		while(curr_node != NULL){
+			printf("%d : %p | ",curr_node->k, &curr_node->next);
+			curr_node = curr_node->next;
+		}
+		printf("\n");
+	}
 	return 0;
 }
