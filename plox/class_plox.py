@@ -1,6 +1,6 @@
 import tokenize
 from scanner import Scanner
-from error_plox import PloxError
+from plox_error import PloxError
 
 class Plox:
     broke = False

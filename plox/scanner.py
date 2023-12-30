@@ -1,6 +1,6 @@
 from token_type import TokenType
 from ttoken import Token
-from error_plox import PloxError
+from plox_error import PloxError
 
 class Scanner:
     _tokens = []
