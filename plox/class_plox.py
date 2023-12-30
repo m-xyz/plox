@@ -1,13 +1,12 @@
 import tokenize
 from scanner import Scanner
+from error_plox import PloxError
 
 class Plox:
     broke = False
 
-    def error(self, line: int, msg: str): self.report(line, "", msg)
-
-    def report(self, line: int, where: str, msg: str):
-        print(f"[LINE {line}] Error {where}: {msg}")
+    def error(self, line: int, msg: str, where: str):
+        PloxError(line, msg, where).report()
         self.broke = True
 
     def run(self, src: str):

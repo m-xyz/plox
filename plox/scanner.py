@@ -1,5 +1,6 @@
 from token_type import TokenType
 from ttoken import Token
+from error_plox import PloxError
 
 class Scanner:
     _tokens = []
@@ -23,6 +24,7 @@ class Scanner:
         c = self.advance()
 
         match c:
+            case '\n': self._line += 1
             case '(': self.add_token(TokenType.LEFT_PAREN, None)
             case ')':self.add_token(TokenType.RIGHT_PAREN, None)
             case '{':self.add_token(TokenType.LEFT_BRACE, None)
@@ -43,8 +45,7 @@ class Scanner:
                     while(self.peek() != '\n' and not self.at_end()): self.advance()
                 else: self.add_token(TokenType.SLASH, None)
             case  _ :
-                print(f"error -> {c}\n")
-                #Plox.error(self._line, "Unexpected character.")
+                PloxError(self._line, f"Unexpected character.\'{c}\'", "").report()
 
     def match(self, expected: str):
         if(self.at_end()): return False
