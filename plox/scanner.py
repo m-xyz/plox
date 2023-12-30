@@ -3,14 +3,18 @@ from ttoken import Token
 from plox_error import PloxError
 
 class Scanner:
-    _tokens = []
+#    _tokens = []
     _start = 0
     _current = 0
     _line = 1
 
     def __init__(self, source: str):
-       self.source = "".join(source)
-       self.N = len(self.source)
+        """
+        Still not sure if tokens should be class or instance var.
+        """
+        self._tokens = []
+        self.source = "".join(source)
+        self.N = len(self.source)
 
     def scan_tokens(self):
         while not self.at_end():
@@ -26,6 +30,7 @@ class Scanner:
         c = self.advance()
 
         match c:
+            case '"': self.string()
             case '(': self.add_token(TokenType.LEFT_PAREN, None)
             case ')':self.add_token(TokenType.RIGHT_PAREN, None)
             case '{':self.add_token(TokenType.LEFT_BRACE, None)
@@ -45,12 +50,23 @@ class Scanner:
             case '\r': pass
             case '\n': self._line += 1
             case '/':
-                if(match('/')):
+                if(self.match('/')):
                     # Find where the comment ends
                     while(self.peek() != '\n' and not self.at_end()): self.advance()
                 else: self.add_token(TokenType.SLASH, None)
             case  _ :
                 PloxError(self._line, f"Unexpected character.\'{c}\'", "").report()
+
+    def string(self):
+        while(self.peek() != '"' and not self.at_end()):
+            if(self.peek() == '\n'): self._line += 1
+            self.advance()
+        if(self.at_end()):
+            PloxError(self._line, f"Unterminated string.", "").report()
+        else:
+            self.advance()
+            value = self.source[self._start + 1:self._current - 1]
+            self.add_token(TokenType.STRING, value)
 
     def match(self, expected: str):
         if(self.at_end()): return False
