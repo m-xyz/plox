@@ -1,6 +1,6 @@
-"
-comment
-"
+#"
+#comment
+#"
 x = True
 i = 0
 while x:

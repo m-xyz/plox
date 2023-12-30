@@ -3,15 +3,11 @@ from ttoken import Token
 from plox_error import PloxError
 
 class Scanner:
-#    _tokens = []
     _start = 0
     _current = 0
     _line = 1
 
     def __init__(self, source: str):
-        """
-        Still not sure if tokens should be class or instance var.
-        """
         self._tokens = []
         self.source = "".join(source)
         self.N = len(self.source)
@@ -20,10 +16,8 @@ class Scanner:
         while not self.at_end():
             self._start = self._current
             self.scan_token()
-        self._tokens.append(Token(TokenType.EOF, "", None, self._line))
+        self._tokens.append(Token(TokenType.EOF, "EOF", None, self._line))
 
-        print(self._tokens)
-        
         return self._tokens
 
     def scan_token(self):
@@ -55,7 +49,9 @@ class Scanner:
                     while(self.peek() != '\n' and not self.at_end()): self.advance()
                 else: self.add_token(TokenType.SLASH, None)
             case  _ :
-                PloxError(self._line, f"Unexpected character.\'{c}\'", "").report()
+                if(c.isdigit()):
+                    self.number()
+                else: PloxError(self._line, f"Unexpected character.\'{c}\'", "").report()
 
     def string(self):
         while(self.peek() != '"' and not self.at_end()):
@@ -67,6 +63,21 @@ class Scanner:
             self.advance()
             value = self.source[self._start + 1:self._current - 1]
             self.add_token(TokenType.STRING, value)
+
+    def number(self):
+        digi_start = self._current
+
+        while(self.peek().isdigit()): self.advance()
+
+        if(self.peek() == '.' and self.peek_next().isdigit()):
+
+            self.advance()
+
+            while(self.peek().isdigit()): self.advance()
+
+            self.add_token(TokenType.NUMBER, float(self.source[self._start:self._current]))
+
+        else: self.add_token(TokenType.NUMBER, int(self.source[self._start:self._current]))
 
     def match(self, expected: str):
         if(self.at_end()): return False
@@ -85,6 +96,11 @@ class Scanner:
         if(self.at_end()): return '\0'
 
         return self.source[self._current]
+    
+    def peek_next(self):
+        if(self._current + 1 >= self.N): return '\0'
+
+        return self.source[self._current + 1]
 
     def add_token(self, ttype: TokenType, literal: object):
         text = self.source[self._start:self._current]

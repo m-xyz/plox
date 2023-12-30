@@ -4,6 +4,7 @@ from plox_error import PloxError
 
 class Plox:
     broke = False
+    DEBUG = False
 
     def error(self, line: int, msg: str, where: str):
         PloxError(line, msg, where).report()
@@ -15,6 +16,7 @@ class Plox:
         """
         scanner = Scanner(src)
         tokens = scanner.scan_tokens()
+        if(self.DEBUG): print(tokens)
 
     def run_file(self, path: str):
         try:
