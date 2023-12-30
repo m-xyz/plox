@@ -9,14 +9,16 @@ class Scanner:
     _line = 1
 
     def __init__(self, source: str):
-        self.source = source
-        self.N = len(source)
+       self.source = "".join(source)
+       self.N = len(self.source)
 
     def scan_tokens(self):
         while not self.at_end():
-            self.start = self._current
+            self._start = self._current
             self.scan_token()
         self._tokens.append(Token(TokenType.EOF, "", None, self._line))
+
+        print(self._tokens)
         
         return self._tokens
 
@@ -24,7 +26,6 @@ class Scanner:
         c = self.advance()
 
         match c:
-            case '\n': self._line += 1
             case '(': self.add_token(TokenType.LEFT_PAREN, None)
             case ')':self.add_token(TokenType.RIGHT_PAREN, None)
             case '{':self.add_token(TokenType.LEFT_BRACE, None)
@@ -39,9 +40,13 @@ class Scanner:
             case '=':self.add_token(TokenType.EQUAL_EQUAL if self.match('=') else TokenType.EQUAL, None)
             case '<':self.add_token(TokenType.LESS_EQUAL if self.match('=') else TokenType.LESS, None)
             case '>':self.add_token(TokenType.GREATER_EQUAL if self.match('=') else TokenType.GREATER, None)
+            case ' ': pass
+            case '\t': pass
+            case '\r': pass
+            case '\n': self._line += 1
             case '/':
                 if(match('/')):
-                    # See where the comment ends
+                    # Find where the comment ends
                     while(self.peek() != '\n' and not self.at_end()): self.advance()
                 else: self.add_token(TokenType.SLASH, None)
             case  _ :
